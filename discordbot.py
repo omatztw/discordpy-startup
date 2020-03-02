@@ -1,3 +1,4 @@
+import os
 import discord
 from datetime import datetime, timedelta
 
