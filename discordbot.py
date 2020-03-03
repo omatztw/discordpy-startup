@@ -8,6 +8,8 @@ channel_id = os.environ['CHANNEL_ID']
 
 @client.event
 async def on_voice_state_update(member, before, after): 
+    if member.bot:
+        return
     if before.channel != after.channel:
         now = datetime.utcnow() + timedelta(hours=9)
         alert_channel = client.get_channel(int(channel_id))
