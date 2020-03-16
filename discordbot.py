@@ -68,9 +68,11 @@ async def oma(ctx, arg=None):
 
 @client.event
 async def on_voice_state_update(member, before, after):
+    global data_mem
     channel_id = data_mem.get(str(member.guild.id))
     if channel_id == None:
         channel_id = get_channel_id_or_default(member.guild)
+        data_mem[str(member.guild.id)] = channel_id
 
     if member.bot:
         return
