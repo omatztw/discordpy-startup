@@ -80,10 +80,12 @@ async def on_voice_state_update(member, before, after):
         now = datetime.utcnow() + timedelta(hours=9)
         alert_channel = client.get_channel(int(channel_id))
         if before.channel is None: 
-            msg = f'{now:%m/%d-%H:%M} に {member.name} が {after.channel.name} に参加しました。'
-            await alert_channel.send(msg)
+            if len(list(filter(lambda m: not m.bot, after.channel.members))) == 0:
+                msg = f'{now:%m/%d-%H:%M} に[{member.name}]さんがチャンネル[{after.channel.name}]で通話を始めました。'
+                await alert_channel.send(msg)
         elif after.channel is None: 
-            msg = f'{now:%m/%d-%H:%M} に {member.name} が {before.channel.name} から退出しました。'
-            await alert_channel.send(msg)
+            if len(list(filter(lambda m: not m.bot, before.channel.members))) == 0:
+                msg = f'{now:%m/%d-%H:%M} にチャンネル[{before.channel.name}]の通話が終了しました。'
+                await alert_channel.send(msg)
 
 client.run(token)
