@@ -87,5 +87,9 @@ async def on_voice_state_update(member, before, after):
         #     if len(list(filter(lambda m: not m.bot, before.channel.members))) == 0:
         #         msg = f'{now:%m/%d-%H:%M} にチャンネル[{before.channel.name}]の通話が終了しました。'
         #         await alert_channel.send(msg)
+        
+    if not before.self_stream and after.self_stream:
+        msg = f'{now:%m/%d-%H:%M} に[{member.name}]さんがチャンネル[{after.channel.name}]でライブ配信を始めました。'
+        await alert_channel.send(msg)
 
 client.run(token)
