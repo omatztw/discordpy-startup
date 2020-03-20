@@ -68,17 +68,19 @@ async def oma(ctx, arg=None):
 
 @client.event
 async def on_voice_state_update(member, before, after):
+    if member.bot:
+        return
+        
     global data_mem
     channel_id = data_mem.get(str(member.guild.id))
     if channel_id == None:
         channel_id = get_channel_id_or_default(member.guild)
         data_mem[str(member.guild.id)] = channel_id
 
-    if member.bot:
-        return
+    alert_channel = client.get_channel(int(channel_id))
+
     if before.channel != after.channel:
         now = datetime.utcnow() + timedelta(hours=9)
-        alert_channel = client.get_channel(int(channel_id))
         if before.channel is None: 
             if len(list(filter(lambda m: not m.bot, after.channel.members))) == 1:
                 msg = f'{now:%m/%d-%H:%M} に[{member.name}]さんがチャンネル[{after.channel.name}]で通話を始めました。'
