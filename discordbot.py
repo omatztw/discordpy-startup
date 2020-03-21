@@ -102,6 +102,7 @@ async def on_voice_state_update(member, before, after):
         now = datetime.utcnow() + timedelta(hours=9)
         if before.channel is None:
             mode = channel['mode']
+            print(mode)
             if mode == 'all' or len(list(filter(lambda m: not m.bot, after.channel.members))) == 1:
                 msg = f'{now:%m/%d-%H:%M} に[{member.name}]さんがチャンネル[{after.channel.name}]で通話を始めました。'
                 await alert_channel.send(msg)
