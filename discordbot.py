@@ -63,7 +63,7 @@ async def oma(ctx, arg=None):
     if arg == 'update':
         upsert_channel_id(ctx.message.guild.id, ctx.message.channel.id)
         data_mem[str(ctx.message.guild.id)] = ctx.message.channel.id
-        await ctx.send("Notification Channel is updated to %s" % ctx.message.channel)
+        await ctx.send("通知するチャンネルを[%s]に変更しました。" % ctx.message.channel)
     
 
 @client.event
