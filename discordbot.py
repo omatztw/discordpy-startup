@@ -78,7 +78,7 @@ async def oma(ctx, *arg):
     
     if arg[0] == 'mode':
         if len(arg) != 2 or (arg[1] not in ['all', 'first']):
-            await ctx.send("Usage: `!oma mode [all, first]`" % ctx.message.channel)
+            await ctx.send("Usage: `!oma mode [all, first]`")
             return
         change_mode(ctx.message.guild.id, arg[1])
         data_mem[str(ctx.message.guild.id)]['mode'] = arg[1]
