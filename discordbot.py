@@ -76,9 +76,9 @@ async def on_guild_join(guild):
     data_mem[str(guild.id)] = {'ch_id': ch_id, 'mode': mode}
 
 @client.command()
-async def oma(ctx, *arg=None):
+async def oma(ctx, *arg):
     global data_mem
-    if arg == None:
+    if len(arg) == 0:
         return
     if arg[0] == 'update':
         upsert_channel_id(ctx.message.guild.id, ctx.message.channel.id)
