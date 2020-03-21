@@ -52,15 +52,6 @@ def get_channel_info_or_default(guild):
         return guild.text_channels[0].id, 'first'
     return channel["ch_id"].strip(), channel["mode"]
 
-def get_mode(guild):
-    with get_connection() as conn:
-        with conn.cursor(cursor_factory=DictCursor) as cur:
-            cur.execute("SELECT mode as mode FROM server_info WHERE server_id = '%s'" % guild.id)
-            result = cur.fetchone()
-            if result == None:
-                return None
-            return dict(result)
-
 @client.event
 async def on_ready():
     global data_mem
@@ -110,7 +101,7 @@ async def on_voice_state_update(member, before, after):
     if before.channel != after.channel:
         now = datetime.utcnow() + timedelta(hours=9)
         if before.channel is None:
-            mode = get_mode(member.guild)
+            mode = channel['mode']
             if mode == 'all' or len(list(filter(lambda m: not m.bot, after.channel.members))) == 1:
                 msg = f'{now:%m/%d-%H:%M} に[{member.name}]さんがチャンネル[{after.channel.name}]で通話を始めました。'
                 await alert_channel.send(msg)
