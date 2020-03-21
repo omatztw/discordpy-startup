@@ -77,7 +77,7 @@ async def oma(ctx, *arg):
         await ctx.send("通知するチャンネルを[%s]に変更しました。" % ctx.message.channel)
     
     if arg[0] == 'mode':
-        if arg[1] == None or (arg[1] not in ['all', 'first']):
+        if len(arg) != 2 or (arg[1] not in ['all', 'first']):
             await ctx.send("Usage: `!oma mode [all, first]`" % ctx.message.channel)
             return
         change_mode(ctx.message.guild.id, arg[1])
