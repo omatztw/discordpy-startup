@@ -90,7 +90,7 @@ async def oma(ctx, *arg):
             await ctx.send("Usage: `!oma mode [all, first]`" % ctx.message.channel)
             return
         change_mode(ctx.message.guild.id, arg[1])
-        await ctx.send("通知モードを[%s]に変更しました。" % MODE_STR[arg[1])
+        await ctx.send("通知モードを[%s]に変更しました。" % MODE_STR[arg[1]])
     
 
 @client.event
