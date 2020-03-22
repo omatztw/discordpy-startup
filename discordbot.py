@@ -50,7 +50,7 @@ def get_channel_info_or_default(guild):
     channel = get_value_by_server_id(guild.id)
     if channel == None:
         channel_id = guild.text_channels[0].id
-        if guild.system_channel
+        if guild.system_channel:
             channel_id = guild.system_channel.id
         upsert_channel_id(guild.id, channel_id)
         return channel_id, 'first'
