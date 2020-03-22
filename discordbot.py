@@ -4,16 +4,12 @@ import os
 import psycopg2
 from psycopg2.extras import DictCursor
 from datetime import datetime, timedelta
-from server_info import Server
+from server_info import Server, Mode
 
 client = commands.Bot(command_prefix="!")
 token = os.environ['DISCORD_BOT_TOKEN']
 database_url = os.environ.get('DATABASE_URL')
 data_mem = dict()
-MODE_STR = {
-    'first': '最初の人のみ',
-    'all': '全員'
-}
 
 def get_connection():
     return psycopg2.connect(database_url)
@@ -62,14 +58,13 @@ async def on_ready():
     all_data = get_all_data()
     if all_data != None:
         for key,ch_id, mode in all_data:
-            # data_mem[key.strip()] = {'ch_id': ch_id.strip(), 'mode': mode}
-            data_mem[key] = Server(key, ch_id, mode)
+            data_mem[key] = Server(key, ch_id, Mode.value_of(mode))
 
 @client.event
 async def on_guild_join(guild):
     global data_mem
     ch_id, mode = get_channel_info_or_default(guild)
-    data_mem[str(guild.id)] = Server(guild.id, ch_id, mode)
+    data_mem[str(guild.id)] = Server(guild.id, ch_id, Mode.value_of(mode))
 
 @client.command()
 async def oma(ctx, *arg):
@@ -82,12 +77,13 @@ async def oma(ctx, *arg):
         await ctx.send("通知するチャンネルを[%s]に変更しました。" % ctx.message.channel)
     
     if arg[0] == 'mode':
-        if len(arg) != 2 or (arg[1] not in ['all', 'first']):
-            await ctx.send("Usage: `!oma mode [all, first]`")
+        if len(arg) != 2 or (arg[1] not in [e.name for e in Mode]):
+            await ctx.send("Usage: `!oma mode %s`" %  [e.name for e in Mode])
             return
-        change_mode(ctx.message.guild.id, arg[1])
-        data_mem[str(ctx.message.guild.id)].mode = arg[1]
-        await ctx.send("通知モードを[%s]に変更しました。" % MODE_STR[arg[1]])
+        mode = Mode.value_of(arg[1])
+        change_mode(ctx.message.guild.id, mode.name)
+        data_mem[str(ctx.message.guild.id)].mode = mode
+        await ctx.send("通知モードを[%s]に変更しました。" % mode.value)
     
 
 @client.event
@@ -100,7 +96,7 @@ async def on_voice_state_update(member, before, after):
     channel = data_mem.get(guild_id)
     if channel == None:
         channel_id, mode = get_channel_info_or_default(member.guild)
-        channel = data_mem[guild_id] = Server(guild_id, channel_id, mode)
+        channel = data_mem[guild_id] = Server(guild_id, channel_id, Mode.value_of(mode))
     
     alert_channel = client.get_channel(int(channel.notification_channel))
 
@@ -108,7 +104,7 @@ async def on_voice_state_update(member, before, after):
         now = datetime.utcnow() + timedelta(hours=9)
         if before.channel is None:
             mode = channel.mode
-            if mode == 'all' or len(list(filter(lambda m: not m.bot, after.channel.members))) == 1:
+            if mode == Mode.all or len(list(filter(lambda m: not m.bot, after.channel.members))) == 1:
                 msg = f'{now:%m/%d-%H:%M} に[{member.name}]さんがチャンネル[{after.channel.name}]で通話を始めました。'
                 await alert_channel.send(msg)
         # elif after.channel is None: 
