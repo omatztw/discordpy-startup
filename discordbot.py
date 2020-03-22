@@ -54,7 +54,7 @@ def get_channel_info_or_default(guild):
             channel_id = guild.system_channel.id
         upsert_channel_id(guild.id, channel_id)
         return channel_id, 'first'
-    return channel["ch_id"].strip(), channel["mode"]
+    return channel["ch_id"], channel["mode"]
 
 @client.event
 async def on_ready():
