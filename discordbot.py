@@ -4,7 +4,7 @@ import os
 import psycopg2
 from psycopg2.extras import DictCursor
 from datetime import datetime, timedelta
-import server_info
+from server_info import Server
 
 client = commands.Bot(command_prefix="!")
 token = os.environ['DISCORD_BOT_TOKEN']
