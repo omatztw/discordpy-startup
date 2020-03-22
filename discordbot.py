@@ -4,6 +4,7 @@ import os
 import psycopg2
 from psycopg2.extras import DictCursor
 from datetime import datetime, timedelta
+import server_info
 
 client = commands.Bot(command_prefix="!")
 token = os.environ['DISCORD_BOT_TOKEN']
@@ -48,8 +49,11 @@ def change_mode(server_id, mode):
 def get_channel_info_or_default(guild):
     channel = get_value_by_server_id(guild.id)
     if channel == None:
-        upsert_channel_id(guild.id, guild.text_channels[0].id)
-        return guild.text_channels[0].id, 'first'
+        channel_id = guild.text_channels[0].id
+        if guild.system_channel
+            channel_id = guild.system_channel.id
+        upsert_channel_id(guild.id, channel_id)
+        return channel_id, 'first'
     return channel["ch_id"].strip(), channel["mode"]
 
 @client.event
@@ -58,13 +62,14 @@ async def on_ready():
     all_data = get_all_data()
     if all_data != None:
         for key,ch_id, mode in all_data:
-            data_mem[key.strip()] = {'ch_id': ch_id.strip(), 'mode': mode}
+            # data_mem[key.strip()] = {'ch_id': ch_id.strip(), 'mode': mode}
+            data_mem[key] = Server(key, ch_id, mode)
 
 @client.event
 async def on_guild_join(guild):
     global data_mem
     ch_id, mode = get_channel_info_or_default(guild)
-    data_mem[str(guild.id)] = {'ch_id': ch_id, 'mode': mode}
+    data_mem[str(guild.id)] = Server(guild.id, ch_id, mode)
 
 @client.command()
 async def oma(ctx, *arg):
@@ -73,7 +78,7 @@ async def oma(ctx, *arg):
         return
     if arg[0] == 'update':
         upsert_channel_id(ctx.message.guild.id, ctx.message.channel.id)
-        data_mem[str(ctx.message.guild.id)]['ch_id'] = ctx.message.channel.id
+        data_mem[str(ctx.message.guild.id)].notification_channel = ctx.message.channel.id
         await ctx.send("通知するチャンネルを[%s]に変更しました。" % ctx.message.channel)
     
     if arg[0] == 'mode':
@@ -81,7 +86,7 @@ async def oma(ctx, *arg):
             await ctx.send("Usage: `!oma mode [all, first]`")
             return
         change_mode(ctx.message.guild.id, arg[1])
-        data_mem[str(ctx.message.guild.id)]['mode'] = arg[1]
+        data_mem[str(ctx.message.guild.id)].mode = arg[1]
         await ctx.send("通知モードを[%s]に変更しました。" % MODE_STR[arg[1]])
     
 
@@ -91,13 +96,13 @@ async def on_voice_state_update(member, before, after):
         return
         
     global data_mem
-    channel = data_mem.get(str(member.guild.id))
+    guild_id = str(member.guild.id)
+    channel = data_mem.get(guild_id)
     if channel == None:
         channel_id, mode = get_channel_info_or_default(member.guild)
-        data_mem[str(member.guild.id)] = {'ch_id': channel_id, 'mode': mode}
+        channel = data_mem[guild_id] = Server(guild_id, channel_id, mode)
     
-    channel = data_mem.get(str(member.guild.id))
-    alert_channel = client.get_channel(int(channel['ch_id']))
+    alert_channel = client.get_channel(int(channel.notification_channel))
 
     if before.channel != after.channel:
         now = datetime.utcnow() + timedelta(hours=9)
