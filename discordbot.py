@@ -130,6 +130,9 @@ async def on_voice_state_update(member, before, after):
         channel_id, mode, mention_everyone, notify = get_channel_info_or_default(member.guild)
         channel = data_mem[guild_id] = Server(guild_id, channel_id, Mode.value_of(mode), mention_everyone, notify)
     
+    if not channel.notify:
+        return
+    
     alert_channel = client.get_channel(int(channel.notification_channel))
 
     msg = ''
