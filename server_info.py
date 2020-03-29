@@ -13,11 +13,12 @@ class Mode(Enum):
 
 class Server(object):
   
-  def __init__(self, guild_id, notification_channel, mode = Mode.first, mention_everyone = False):
+  def __init__(self, guild_id, notification_channel, mode = Mode.first, mention_everyone = False, notify = False):
     self.guild_id = guild_id
     self.notification_channel = notification_channel
     self.mode = mode
     self.mention_everyone = mention_everyone
+    self.notify = notify
   
   
 

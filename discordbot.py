@@ -17,7 +17,7 @@ def get_connection():
 def get_value_by_server_id(server_id):
     with get_connection() as conn:
         with conn.cursor(cursor_factory=DictCursor) as cur:
-            cur.execute("SELECT voice_notification_channel as ch_id, mode as mode, mention_everyone as mention_everyone FROM server_info WHERE server_id='%s'" % (server_id,))
+            cur.execute("SELECT voice_notification_channel as ch_id, mode as mode, mention_everyone as mention_everyone, notify as notify FROM server_info WHERE server_id='%s'" % (server_id,))
             result = cur.fetchone()
             if result == None:
                 return None
@@ -26,7 +26,7 @@ def get_value_by_server_id(server_id):
 def get_all_data():
     with get_connection() as conn:
         with conn.cursor(cursor_factory=DictCursor) as cur:
-            cur.execute("SELECT server_id as server_id, voice_notification_channel as ch_id, mode as mode, mention_everyone as mention_everyone FROM server_info")
+            cur.execute("SELECT server_id as server_id, voice_notification_channel as ch_id, mode as mode, mention_everyone as mention_everyone, notify as notify FROM server_info")
             result = cur.fetchall()
             return result
 
@@ -48,6 +48,12 @@ def update_mention_everyone(server_id, mention_everyone):
             cur.execute("UPDATE server_info SET mention_everyone = '%s' WHERE server_id = '%s'" % (mention_everyone, server_id))
         conn.commit()
 
+def update_notify(server_id, notify):
+    with get_connection() as conn:
+        with conn.cursor(cursor_factory=DictCursor) as cur:
+            cur.execute("UPDATE server_info SET notify = '%s' WHERE server_id = '%s'" % (notify, server_id))
+        conn.commit()
+
 def get_channel_info_or_default(guild):
     channel = get_value_by_server_id(guild.id)
     if channel == None:
@@ -56,24 +62,24 @@ def get_channel_info_or_default(guild):
             channel_id = guild.system_channel.id
         upsert_channel_id(guild.id, channel_id)
         return channel_id, 'first', False
-    return channel["ch_id"], channel["mode"], channel["mention_everyone"]
+    return channel["ch_id"], channel["mode"], channel["mention_everyone"], channel["notify"]
 
 def str2bool(s):
-     return s.lower() in ["true", "t", "yes", "1"]
+     return s.lower() in ["true", "t", "yes", "1", "on"]
 
 @client.event
 async def on_ready():
     global data_mem
     all_data = get_all_data()
     if all_data != None:
-        for key,ch_id, mode, mention_everyone in all_data:
-            data_mem[key] = Server(key, ch_id, Mode.value_of(mode), mention_everyone)
+        for key,ch_id, mode, mention_everyone, notify in all_data:
+            data_mem[key] = Server(key, ch_id, Mode.value_of(mode), mention_everyone, notify)
 
 @client.event
 async def on_guild_join(guild):
     global data_mem
-    ch_id, mode, mention_everyone = get_channel_info_or_default(guild)
-    data_mem[str(guild.id)] = Server(guild.id, ch_id, Mode.value_of(mode), mention_everyone)
+    ch_id, mode, mention_everyone, notify = get_channel_info_or_default(guild)
+    data_mem[str(guild.id)] = Server(guild.id, ch_id, Mode.value_of(mode), mention_everyone, notify)
 
 @client.command()
 async def oma(ctx, *arg):
@@ -93,7 +99,7 @@ async def oma(ctx, *arg):
         change_mode(ctx.message.guild.id, mode.name)
         data_mem[str(ctx.message.guild.id)].mode = mode
         await ctx.send("通知モードを[%s]に変更しました。" % mode.value)
-    
+
     if arg[0] == 'mention':
         if len(arg) != 2 or (arg[1] not in ['yes', 'no']):
             await ctx.send("Usage: `!oma mention %s`" %  ['yes', 'no'])
@@ -102,6 +108,15 @@ async def oma(ctx, *arg):
         update_mention_everyone(ctx.message.guild.id, str2bool(arg[1]))
         data_mem[str(ctx.message.guild.id)].mention_everyone = str2bool(arg[1])
         await ctx.send("全員へのメンションを[%s]に変更しました。" % arg[1])
+
+    if arg[0] == 'notify':
+        if len(arg) != 2 or (arg[1] not in ['on', 'off']):
+            await ctx.send("Usage: `!oma notify %s`" %  ['on', 'off'])
+            return
+        
+        update_notify(ctx.message.guild.id, str2bool(arg[1]))
+        data_mem[str(ctx.message.guild.id)].notify = str2bool(arg[1])
+        await ctx.send("通知昨日を[%s]に変更しました。" % arg[1])
 
 @client.event
 async def on_voice_state_update(member, before, after):
@@ -112,8 +127,8 @@ async def on_voice_state_update(member, before, after):
     guild_id = str(member.guild.id)
     channel = data_mem.get(guild_id)
     if channel == None:
-        channel_id, mode, mention_everyone = get_channel_info_or_default(member.guild)
-        channel = data_mem[guild_id] = Server(guild_id, channel_id, Mode.value_of(mode), mention_everyone)
+        channel_id, mode, mention_everyone, notify = get_channel_info_or_default(member.guild)
+        channel = data_mem[guild_id] = Server(guild_id, channel_id, Mode.value_of(mode), mention_everyone, notify)
     
     alert_channel = client.get_channel(int(channel.notification_channel))
 
