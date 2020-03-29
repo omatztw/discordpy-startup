@@ -116,7 +116,7 @@ async def oma(ctx, *arg):
         
         update_notify(ctx.message.guild.id, str2bool(arg[1]))
         data_mem[str(ctx.message.guild.id)].notify = str2bool(arg[1])
-        await ctx.send("通知昨日を[%s]に変更しました。" % arg[1])
+        await ctx.send("通知機能を[%s]に変更しました。" % arg[1])
 
 @client.event
 async def on_voice_state_update(member, before, after):
