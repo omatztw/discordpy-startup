@@ -74,6 +74,8 @@ def str2bool(s):
 def get_raid_time():
     headers = {"content-type": "application/json"}
     response = requests.get(sheet_url, headers=headers).json()
+    ron_list =  [datetime.datetime.strptime(x, '%Y/%m/%d %H:%M:%S').strftime('%Y/%m/%d %H:%M:%S') for x in response["ron"]]
+    modafu_list =  [datetime.datetime.strptime(x, '%Y/%m/%d %H:%M:%S').strftime('%Y/%m/%d %H:%M:%S') for x in response["modafu"]]
     msg = """```
  ゴルロン               ゴルモダフ                
 +---------------------+---------------------+
@@ -84,9 +86,9 @@ def get_raid_time():
 | %s | %s |
 +---------------------+---------------------+
 ```""" % (
-        response["ron"][0], response["modafu"][0],
-        response["ron"][1], response["modafu"][1],
-        response["ron"][2], response["modafu"][2]
+        ron_list[0], modafu_list[0],
+        ron_list[1], modafu_list[1],
+        ron_list[2], modafu_list[2]
         )
     return msg
 
