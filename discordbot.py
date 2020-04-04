@@ -64,7 +64,7 @@ def get_channel_info_or_default(guild):
         if guild.system_channel:
             channel_id = guild.system_channel.id
         upsert_channel_id(guild.id, channel_id)
-        return channel_id, 'first', False
+        return channel_id, 'first', False, True
     return channel["ch_id"], channel["mode"], channel["mention_everyone"], channel["notify"]
 
 def str2bool(s):
