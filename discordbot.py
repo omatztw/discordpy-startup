@@ -2,13 +2,17 @@ import discord
 from discord.ext import commands
 import os
 import psycopg2
+import requests
+import datetime
 from psycopg2.extras import DictCursor
 from datetime import datetime, timedelta
 from server_info import Server, Mode
 
+
 client = commands.Bot(command_prefix="!")
 token = os.environ['DISCORD_BOT_TOKEN']
 database_url = os.environ.get('DATABASE_URL')
+sheet_url = os.environ.get('SHEET_URL')
 data_mem = dict()
 
 def get_connection():
@@ -67,6 +71,25 @@ def get_channel_info_or_default(guild):
 def str2bool(s):
      return s.lower() in ["true", "t", "yes", "1", "on"]
 
+def get_raid_time():
+    headers = {"content-type": "application/json"}
+    response = requests.get(sheet_url, headers=headers).json()
+    msg = """```
+ ゴルロン               ゴルモダフ                
++---------------------+---------------------+
+| %s | %s |
++---------------------+---------------------+
+| %s | %s |
++---------------------+---------------------+
+| %s | %s |
++---------------------+---------------------+
+```""" % (
+        response["ron"][0], response["modafu"][0],
+        response["ron"][1], response["modafu"][1],
+        response["ron"][2], response["modafu"][2]
+        )
+    return msg
+
 @client.event
 async def on_ready():
     global data_mem
@@ -90,6 +113,10 @@ async def oma(ctx, *arg):
         upsert_channel_id(ctx.message.guild.id, ctx.message.channel.id)
         data_mem[str(ctx.message.guild.id)].notification_channel = ctx.message.channel.id
         await ctx.send("通知するチャンネルを[%s]に変更しました。" % ctx.message.channel)
+    
+    if arg[0] == 'raid':
+        msg = get_raid_time()
+        await ctx.send(msg)
     
     if arg[0] == 'mode':
         if len(arg) != 2 or (arg[1] not in [e.name for e in Mode]):
