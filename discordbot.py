@@ -3,7 +3,6 @@ from discord.ext import commands
 import os
 import psycopg2
 import requests
-import datetime
 from psycopg2.extras import DictCursor
 from datetime import datetime, timedelta
 from server_info import Server, Mode
@@ -74,8 +73,8 @@ def str2bool(s):
 def get_raid_time():
     headers = {"content-type": "application/json"}
     response = requests.get(sheet_url, headers=headers).json()
-    ron_list =  [datetime.datetime.strptime(x, '%Y/%m/%d %H:%M:%S').strftime('%Y/%m/%d %H:%M:%S') for x in response["ron"]]
-    modafu_list =  [datetime.datetime.strptime(x, '%Y/%m/%d %H:%M:%S').strftime('%Y/%m/%d %H:%M:%S') for x in response["modafu"]]
+    ron_list =  [datetime.strptime(x, '%Y/%m/%d %H:%M:%S').strftime('%Y/%m/%d %H:%M:%S') for x in response["ron"]]
+    modafu_list =  [datetime.strptime(x, '%Y/%m/%d %H:%M:%S').strftime('%Y/%m/%d %H:%M:%S') for x in response["modafu"]]
     msg = """```
  ゴルロン               ゴルモダフ                
 +---------------------+---------------------+
