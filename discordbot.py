@@ -172,7 +172,7 @@ async def on_voice_state_update(member, before, after):
         if before.channel is None:
             mode = channel.mode
             if mode == Mode.all or len(list(filter(lambda m: not m.bot, after.channel.members))) == 1:
-                msg += f'{now:%m/%d-%H:%M} に[{member.name}]さんがチャンネル[{after.channel.name}]で通話を始めました。'
+                msg += f'[{member.name}]さんがチャンネル[{after.channel.name}]で通話を始めました。'
                 await alert_channel.send(msg)
         # elif after.channel is None: 
         #     if len(list(filter(lambda m: not m.bot, before.channel.members))) == 0:
@@ -181,7 +181,7 @@ async def on_voice_state_update(member, before, after):
 
     if not before.self_stream and after.self_stream:
         now = datetime.utcnow() + timedelta(hours=9)
-        msg += f'{now:%m/%d-%H:%M} に[{member.name}]さんがチャンネル[{after.channel.name}]でライブ配信を始めました。'
+        msg += f'[{member.name}]さんがチャンネル[{after.channel.name}]でライブ配信を始めました。'
         await alert_channel.send(msg)
 
 client.run(token)
