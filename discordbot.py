@@ -163,6 +163,10 @@ async def on_voice_state_update(member, before, after):
     
     alert_channel = client.get_channel(int(channel.notification_channel))
 
+    if alert_channel is None:
+        print("alert channel is not found.. already deleted? GUILD: %s NOTIFICATION_CH: %s" % (channel.guild_id, channel.notification_channel) )
+        return
+
     msg = ''
     if channel.mention_everyone:
         msg += '@everyone '
