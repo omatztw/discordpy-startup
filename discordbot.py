@@ -81,12 +81,14 @@ def get_channel_info_or_default(guild):
 def str2bool(s):
      return s.lower() in ["true", "t", "yes", "1", "on"]
 
-def get_raid_time(server_type = 'elph'):
+def get_raid_time(server_type):
     headers = {"content-type": "application/json"}
-    response = requests.get(sheet_url_dict[server_type], headers=headers).json()
+    response = requests.get(sheet_url_dict[server_type.name], headers=headers).json()
     ron_list =  [datetime.strptime(x, '%Y/%m/%d %H:%M:%S').strftime('%H:%M:%S') for x in response["ron"]]
     modafu_list =  [datetime.strptime(x, '%Y/%m/%d %H:%M:%S').strftime('%H:%M:%S') for x in response["modafu"]]
-    msg = """```
+    msg = """
+**[%s]サーバー**
+```
  ゴルロン    ゴルモダフ
 +----------+----------+
 | %s | %s |
@@ -96,6 +98,7 @@ def get_raid_time(server_type = 'elph'):
 | %s | %s |
 +----------+----------+
 ```""" % (
+        server_type.value,
         ron_list[0], modafu_list[0],
         ron_list[1], modafu_list[1],
         ron_list[2], modafu_list[2]
@@ -136,7 +139,7 @@ async def oma(ctx, *arg):
 
     
     if arg[0] == 'raid':
-        msg = get_raid_time(data_mem[str(ctx.message.guild.id)].server_type.name)
+        msg = get_raid_time(data_mem[str(ctx.message.guild.id)].server_type)
         await ctx.send(msg)
     
     if arg[0] == 'mode':
