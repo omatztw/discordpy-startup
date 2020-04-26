@@ -18,7 +18,7 @@ class ServerType(Enum):
 
   @classmethod
   def value_of(cls, target_value):
-    for e in Mode:
+    for e in ServerType:
       if e.name == target_value:
         return e
     raise ValueError("%sは有効なサーバーではありません" % target_value)
