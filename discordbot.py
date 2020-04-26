@@ -87,7 +87,7 @@ def get_raid_time(server_type):
     ron_list =  [datetime.strptime(x, '%Y/%m/%d %H:%M:%S').strftime('%H:%M:%S') for x in response["ron"]]
     modafu_list =  [datetime.strptime(x, '%Y/%m/%d %H:%M:%S').strftime('%H:%M:%S') for x in response["modafu"]]
     msg = """
-**[%s]サーバー**
+**%s**
 ```
  ゴルロン    ゴルモダフ
 +----------+----------+
