@@ -115,7 +115,7 @@ def get_soba(category):
         msg =  get_om(response['list'])
     elif category == 'fm':
         msg =  get_fm(response['list'])
-    else
+    else:
         raise Exception("知らんカテゴリ")
     
     return msg
