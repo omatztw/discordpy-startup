@@ -3,6 +3,7 @@ from discord.ext import commands
 import os
 import psycopg2
 import requests
+import unicodedata
 from psycopg2.extras import DictCursor
 from datetime import datetime, timedelta
 from server_info import Server, Mode, ServerType
@@ -123,14 +124,14 @@ def get_soba(category):
 def get_om(om_list):
     msg = "```\n"
     for item in om_list:
-        msg += "%s%s%s%s\n" % (item[0].ljust(2), ljust(item[1], 30), ljust(str(item[2]), 7), ljust(str(item[3]), 5))
+        msg += "%s%s%s%s\n" % (item[0].ljust(2), left(item[1], 30), left(str(item[2]), 7), left(str(item[3]), 5))
     msg += "```"
     return msg
 
 def get_fm(fm_list):
     msg = "```\n"
     for item in fm_list:
-        msg += "%s%s%s\n" % (item[0].ljust(2), ljust(item[1], 30), ljust(str(item[2])+item[3], 15))
+        msg += "%s%s%s\n" % (item[0].ljust(2), left(item[1], 30), left(str(item[2])+item[3], 15))
     msg += "```"
     return msg
 
@@ -142,6 +143,14 @@ def ljust(string,length):
         else:
             count_length += 2
     return string + (length-count_length) * ' '
+
+def left(msg, digit):
+    for c in msg:
+        if unicodedata.east_asian_width(c) in ('F', 'W', 'A'):
+            digit -= 2
+        else:
+            digit -= 1
+    return　msg + ' '*digit
 
 @client.event
 async def on_ready():
