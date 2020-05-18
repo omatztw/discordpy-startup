@@ -122,19 +122,17 @@ def get_soba(category):
     return msg
 
 def get_om(om_list):
-    msg = ""
-    # msg = "```\n"
+    msg = "```\n"
     for item in om_list:
         msg += "%s%s%s%s\n" % (item[0].ljust(2), left(item[1], 30), left(str(item[2]), 7), left(str(item[3]), 5))
-    # msg += "```"
+    msg += "```"
     return msg
 
 def get_fm(fm_list):
-    msg = ""
-    # msg = "```\n"
+    msg = "```\n"
     for item in fm_list:
         msg += "%s%s%s\n" % (item[0].ljust(2), left(item[1], 30), left(str(item[2])+item[3], 15))
-    # msg += "```"
+    msg += "```"
     return msg
 
 def ljust(string,length):
