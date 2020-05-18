@@ -17,6 +17,7 @@ sheet_url_dict = {
     'rose': os.environ.get('SHEET_URL_ROSE'),
     'moen': os.environ.get('SHEET_URL_MOEN')
 }
+soba_url = os.environ.get('SOBA_URL')
 data_mem = dict()
 
 def get_connection():
@@ -105,6 +106,38 @@ def get_raid_time(server_type):
         )
     return msg
 
+def get_soba(category):
+    params = {'category': category}
+    headers = {"content-type": "application/json"}
+    response = requests.get(soba_url, headers=headers, params = params).json()
+    msg = ""
+    if category == 'om':
+        msg =  get_om(response['list'])
+    elif category == 'fm':
+        msg =  get_fm(response['list'])
+    else
+        raise Exception("知らんカテゴリ")
+    
+    return msg
+
+def get_om(om_list):
+    msg = "```\n"
+    msg += "+-+----------+-----+-----+\n"
+    for item in om_list:
+        msg += "|%s|%s|%s|%s|\n" % (item[0], item[1].ljust(30), str(item[2]).ljust(5), str(item[3]).ljust(5))
+        msg += "+-+----------+-----+-----+\n"
+    msg += "```"
+    return msg
+
+def get_fm(fm_list):
+    msg = "```\n"
+    msg += "+-+----------+-----+-----+\n"
+    for item in fm_list:
+        msg += "|%s|%s|%s|%s|\n" % (item[0], item[1].ljust(30), item[2].ljust(15), item[3].ljust(2))
+        msg += "+-+----------+-----+-----+\n"
+    msg += "```"
+    return msg
+
 @client.event
 async def on_ready():
     global data_mem
@@ -140,6 +173,13 @@ async def oma(ctx, *arg):
     
     if arg[0] == 'raid':
         msg = get_raid_time(data_mem[str(ctx.message.guild.id)].server_type)
+        await ctx.send(msg)
+    
+    if arg[0] == 'soba':
+        if len(arg) != 2 or (arg[1] not in ['om', 'fm']):
+            await ctx.send("Usage: `!oma soba %s`" %  ['om', 'fm'])
+            return
+        msg = get_soba(arg[1])
         await ctx.send(msg)
     
     if arg[0] == 'mode':
