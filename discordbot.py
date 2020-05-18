@@ -122,21 +122,30 @@ def get_soba(category):
 
 def get_om(om_list):
     msg = "```\n"
-    msg += "+-+----------+-----+-----+\n"
+    msg += "+-+-----------------------------+-----+-----+\n"
     for item in om_list:
-        msg += "|%s|%s|%s|%s|\n" % (item[0], item[1].ljust(30), str(item[2]).ljust(5), str(item[3]).ljust(5))
-        msg += "+-+----------+-----+-----+\n"
+        msg += "|%s|%s|%s|%s|\n" % (item[0], ljust(item[1], 30), ljust(str(item[2]), 5), ljust(str(item[3]), 5))
+        msg += "+-+-----------------------------+-----+-----+\n"
     msg += "```"
     return msg
 
 def get_fm(fm_list):
     msg = "```\n"
-    msg += "+-+----------+-----+-----+\n"
+    msg += "+-+----------------------------+---------------+--+\n"
     for item in fm_list:
-        msg += "|%s|%s|%s|%s|\n" % (item[0], item[1].ljust(30), item[2].ljust(15), item[3].ljust(2))
-        msg += "+-+----------+-----+-----+\n"
+        msg += "|%s|%s|%s|%s|\n" % (item[0], ljust(item[1], 30), ljust(str(item[2]), 15), ljust(item[3], 2))
+        msg += "+-+----------------------------+---------------+--+\n"
     msg += "```"
     return msg
+
+def ljust(string,length):
+    count_length = 0
+    for char in string.encode().decode('utf8'):
+        if ord(char) <= 255:
+            count_length += 1
+        else:
+            count_length += 2
+    return string + (length-count_length) * ' '
 
 @client.event
 async def on_ready():
