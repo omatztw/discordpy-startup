@@ -150,7 +150,7 @@ def left(msg, digit):
             digit -= 2
         else:
             digit -= 1
-    return　msg + ' '*digit
+    return msg + ' '*digit
 
 @client.event
 async def on_ready():
