@@ -122,17 +122,19 @@ def get_soba(category):
     return msg
 
 def get_om(om_list):
-    msg = "```\n"
+    msg = ""
+    # msg = "```\n"
     for item in om_list:
         msg += "%s%s%s%s\n" % (item[0].ljust(2), left(item[1], 30), left(str(item[2]), 7), left(str(item[3]), 5))
-    msg += "```"
+    # msg += "```"
     return msg
 
 def get_fm(fm_list):
-    msg = "```\n"
+    msg = ""
+    # msg = "```\n"
     for item in fm_list:
         msg += "%s%s%s\n" % (item[0].ljust(2), left(item[1], 30), left(str(item[2])+item[3], 15))
-    msg += "```"
+    # msg += "```"
     return msg
 
 def ljust(string,length):
@@ -146,11 +148,12 @@ def ljust(string,length):
 
 def left(msg, digit):
     for c in msg:
-        if unicodedata.east_asian_width(c) in ('F', 'W', 'A'):
-            digit -= 2
-        else:
+        if unicodedata.east_asian_width(c) in ('Na', 'H'):
             digit -= 1
-    return msg + ' '*digit
+        else:
+            digit -= 2
+    print(digit)
+    return msg + u' '*digit
 
 @client.event
 async def on_ready():
