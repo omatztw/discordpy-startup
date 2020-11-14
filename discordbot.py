@@ -194,7 +194,7 @@ async def oma(ctx, *arg):
         data_mem[str(ctx.message.guild.id)].server_type = server_type
         await ctx.send("サーバーを[%s]に変更しました。" % server_type.value)
 
-    if arg[0] == 'rsj':
+    if arg[0] == 'saiki':
         msg = restart_jyo()
         await ctx.send(msg)
     
