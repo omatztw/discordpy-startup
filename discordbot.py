@@ -19,6 +19,7 @@ sheet_url_dict = {
     'moen': os.environ.get('SHEET_URL_MOEN')
 }
 soba_url = os.environ.get('SOBA_URL')
+jyo_url = os.environ.get('JYO_URL')
 data_mem = dict()
 
 def get_connection():
@@ -82,6 +83,14 @@ def get_channel_info_or_default(guild):
 
 def str2bool(s):
      return s.lower() in ["true", "t", "yes", "1", "on"]
+    
+
+def restart_jyo():
+    headers = {"content-type": "application/json"}
+    response = requests.post(jyo_url, headers=headers)
+    if response.status_code == requests.codes.ok:
+        return '嬢ちゃんを再起動しました'
+    return '嬢ちゃんの再起動に失敗したかもしれん( ˘ω˘ )'
 
 def get_raid_time(server_type):
     headers = {"content-type": "application/json"}
@@ -185,6 +194,9 @@ async def oma(ctx, *arg):
         data_mem[str(ctx.message.guild.id)].server_type = server_type
         await ctx.send("サーバーを[%s]に変更しました。" % server_type.value)
 
+    if arg[0] == 'rsj':
+        msg = restart_jyo()
+        await ctx.send(msg)
     
     if arg[0] == 'raid':
         msg = get_raid_time(data_mem[str(ctx.message.guild.id)].server_type)
